@@ -1,0 +1,31 @@
+name: Kubernetes Security Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate YAML
+        run: python - <<'PY'
+import pathlib, sys
+try:
+    import yaml
+except Exception as exc:
+    print(f'PyYAML unavailable: {exc}')
+    sys.exit(1)
+for p in pathlib.Path('k8s').glob('*.yaml'):
+    with p.open() as f:
+        list(yaml.safe_load_all(f))
+print('YAML validation passed')
+PY
+      - name: Run security assertions
+        run: bash tests/test_security.sh
