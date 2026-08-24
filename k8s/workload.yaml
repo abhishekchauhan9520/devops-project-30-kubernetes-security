@@ -21,10 +21,11 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: nginx:1.29-alpine
+          image: nginxinc/nginx-unprivileged:1.29-alpine
           ports:
             - containerPort: 8080
           securityContext:
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
@@ -41,8 +42,12 @@ spec:
               mountPath: /var/cache/nginx
             - name: nginx-run
               mountPath: /var/run
+            - name: nginx-tmp
+              mountPath: /tmp
       volumes:
         - name: nginx-cache
           emptyDir: {}
         - name: nginx-run
+          emptyDir: {}
+        - name: nginx-tmp
           emptyDir: {}
