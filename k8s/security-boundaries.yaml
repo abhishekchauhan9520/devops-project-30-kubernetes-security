@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-boundary-policy
+  namespace: security-demo
+data:
+  policy: |
+    The application identity is namespace-scoped and may only read ConfigMaps.
+    It cannot create workloads, exec into Pods, read Secrets, or modify RBAC.
+    Network traffic is default-deny with only DNS, ingress-controller, and
+    application-to-database paths allowed.
