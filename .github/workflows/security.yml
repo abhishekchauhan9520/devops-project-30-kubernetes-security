@@ -14,14 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install validation dependency
+        run: python -m pip install --disable-pip-version-check pyyaml
       - name: Validate YAML
         run: python - <<'PY'
-import pathlib, sys
-try:
-    import yaml
-except Exception as exc:
-    print(f'PyYAML unavailable: {exc}')
-    sys.exit(1)
+import pathlib
+import yaml
 for p in pathlib.Path('k8s').glob('*.yaml'):
     with p.open() as f:
         list(yaml.safe_load_all(f))
@@ -29,3 +27,5 @@ print('YAML validation passed')
 PY
       - name: Run security assertions
         run: bash tests/test_security.sh
+      - name: Run workload assertions
+        run: python tests/validate-workload.py
